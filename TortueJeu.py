@@ -3,22 +3,24 @@ import random
 
 pygame.init()
 
-
 largeur_fenetre = 400
 hauteur_fenetre = 600
 taille_case = 50
 
-BLANC = (255, 255, 255)
-VERT = (0, 255, 0)
-BLEU = (0, 0, 255)
-ROUGE = (255, 0, 0)
-
 fenetre = pygame.display.set_mode((largeur_fenetre, hauteur_fenetre))
 pygame.display.set_caption("Tortue Montante")
 
+# Chargement des images
+image_tortue = pygame.image.load("tortue.png")
+image_dechet = pygame.image.load("dechets.png")
+background = pygame.image.load("background.jpg")  # Charger le fond
+
+# Redimensionnement des images
+image_tortue = pygame.transform.scale(image_tortue, (taille_case, taille_case))
+image_dechet = pygame.transform.scale(image_dechet, (taille_case, taille_case))
+background = pygame.transform.scale(background, (largeur_fenetre, hauteur_fenetre))  # Ajuster le fond à la taille de la fenêtre
 
 pos_tortue = [largeur_fenetre // 2, hauteur_fenetre - taille_case]
-
 
 obstacles = []
 
@@ -28,8 +30,9 @@ def creer_obstacles():
     obstacles.clear()
     for i in range(0, hauteur_fenetre, taille_case):
         for j in range(0, largeur_fenetre, taille_case):
-            if random.random() < 0.1:  # 10% de chance de mettre un déchet sur chaque case
-                obstacles.append(pygame.Rect(j, i, taille_case, taille_case))
+            if i != hauteur_fenetre - taille_case:  # Ignorer la première ligne (ligne de départ)
+                if random.random() < 0.1:  # 10% de chance de mettre un déchet sur chaque case
+                    obstacles.append(pygame.Rect(j, i, taille_case, taille_case))
 
 # Création initiale des obstacles
 creer_obstacles()
@@ -69,15 +72,15 @@ while jeu:
         print("Bravo ! Vous avez gagné !")
         jeu = False
 
-    
-    fenetre.fill(BLANC)
-
-    # Dessin de la tortue
-    pygame.draw.rect(fenetre, VERT, tortue)
+    # Affichage du fond d'écran
+    fenetre.blit(background, (0, 0))
 
     # Dessin des obstacles
     for obstacle in obstacles:
-        pygame.draw.rect(fenetre, ROUGE, obstacle)
+        fenetre.blit(image_dechet, (obstacle.x, obstacle.y))
+
+    # Dessin de la tortue
+    fenetre.blit(image_tortue, (tortue.x, tortue.y))
 
     # Mise à jour de l'affichage
     pygame.display.flip()
