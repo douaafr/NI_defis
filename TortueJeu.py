@@ -30,7 +30,8 @@ def creer_obstacles():
     obstacles.clear()
     for i in range(0, hauteur_fenetre, taille_case):
         for j in range(0, largeur_fenetre, taille_case):
-            if i != hauteur_fenetre - taille_case:  # Ignorer la première ligne (ligne de départ)
+            # Ne pas placer d'obstacles sur la ligne de départ
+            if i != hauteur_fenetre - taille_case:  
                 if random.random() < 0.1:  # 10% de chance de mettre un déchet sur chaque case
                     obstacles.append(pygame.Rect(j, i, taille_case, taille_case))
 
