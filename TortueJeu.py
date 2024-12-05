@@ -40,6 +40,13 @@ def creer_obstacles():
                     obstacles.append(pygame.Rect(j, i, taille_case, taille_case))
                     dechets_sur_la_ligne += 1
 
+# Fonction pour afficher un message à l'écran
+def afficher_message(fenetre, texte, taille, couleur, x, y):
+    police = pygame.font.Font(None, taille)
+    surface_texte = police.render(texte, True, couleur)
+    rect_texte = surface_texte.get_rect(center=(x, y))
+    fenetre.blit(surface_texte, rect_texte)
+
 # Création initiale des obstacles
 creer_obstacles()
 
@@ -48,9 +55,28 @@ clock = pygame.time.Clock()
 vitesse = 5
 score = 0
 jeu = True
+en_jeu = False  # Ajout d'une phase d'attente avant le début
+message_collision = ""
 
 # Boucle de jeu
 while jeu:
+    if not en_jeu:
+        # Afficher le message de début avec une taille de police plus petite
+        fenetre.blit(background, (0, 0))
+        afficher_message(fenetre, "Appuyez sur une touche pour commencer", 24, (255, 255, 255), largeur_fenetre // 2, hauteur_fenetre // 2)
+        pygame.display.flip()
+        
+        # Attendre que le joueur appuie sur une touche pour commencer
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                jeu = False
+            if event.type == pygame.KEYDOWN:
+                en_jeu = True
+        continue
+
+    # Réinitialiser le message de collision à chaque itération
+    message_collision = ""
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             jeu = False
@@ -69,14 +95,17 @@ while jeu:
     # Vérification de la collision avec les déchets
     for obstacle in obstacles:
         if tortue.colliderect(obstacle):
-            print("Vous avez touché un déchet ! Retour au départ.")
+            message_collision = "Vous avez touché un déchet ! Retour au départ."
             tortue.x = largeur_fenetre // 2
             tortue.y = hauteur_fenetre - taille_case
             break
 
     # Vérification si la tortue atteint la fin de la matrice
     if tortue.y <= 0:
-        print("Bravo ! Vous avez gagné !")
+        fenetre.blit(background, (0, 0))
+        afficher_message(fenetre, "Vous avez accés a notre site !", 36, (255, 255, 255), largeur_fenetre // 2, hauteur_fenetre // 2)
+        pygame.display.flip()
+        pygame.time.wait(3000)  # Attendre 3 secondes avant de fermer
         jeu = False
 
     # Affichage du fond d'écran
@@ -88,6 +117,10 @@ while jeu:
 
     # Dessin de la tortue
     fenetre.blit(image_tortue, (tortue.x, tortue.y))
+
+    # Afficher le message de collision s'il existe
+    if message_collision:
+        afficher_message(fenetre, message_collision, 24, (255, 0, 0), largeur_fenetre // 2, hauteur_fenetre // 2 + 100)
 
     # Mise à jour de l'affichage
     pygame.display.flip()
